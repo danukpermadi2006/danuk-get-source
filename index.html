@@ -1,263 +1,574 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="light dark">
-<title>Ambil source code web target</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;500&display=swap">
-<style>
-:root{--bg:#e8ecef;--panel:#fbfcfd;--ink:#18212b;--mute:#566271;--line:#c5ced8;--h:#c2410c;--c:#1d4ed8;--j:#ca8a04;--err:#b42318;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#11151b;--panel:#181e26;--ink:#e6ebf1;--mute:#9aa6b5;--line:#2b3441;--h:#fb8a5c;--c:#7aa7ff;--j:#f2c94c;--err:#ff8f86}}
-*,*::before,*::after{box-sizing:inherit}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif}
-main{max-width:52rem;margin:0 auto;padding:28px 16px 56px}
-h1{margin:0;font-size:clamp(2rem,8vw,3rem);line-height:1.02;font-weight:800;letter-spacing:-.035em}
-.sub{max-width:42ch;margin:10px 0 24px;color:var(--mute)}
-:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-.field{display:grid;gap:10px}
-@media(min-width:560px){.field{grid-template-columns:1fr auto}}
-input[type=text],select{width:100%;padding:13px 12px;font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px}
-button{font:inherit;font-weight:600;cursor:pointer;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
-.go{padding:13px 20px;font-size:1.05rem;color:var(--bg);background:var(--ink);border-color:var(--ink)}
-.go:disabled{opacity:.6;cursor:progress}
-.opt{margin-top:12px}
-.opt summary,.src summary{cursor:pointer;color:var(--mute);font-weight:600;padding:6px 0}
-.grid{display:grid;gap:12px;margin-top:8px}
-@media(min-width:560px){.grid{grid-template-columns:1fr 1fr}}
-label{display:block;margin:0 0 6px;font-size:.85rem;font-weight:600;color:var(--mute)}
-.chk{display:flex;align-items:center;gap:8px;margin:14px 0 0;font-size:.95rem;font-weight:400;color:var(--ink)}
-#msg{min-height:1.55em;margin:14px 0 0;font-size:.95rem;color:var(--mute)}
-#msg.err{color:var(--err)}
-#res{display:none;margin-top:24px}
-.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
-.tabs button{display:flex;align-items:center;gap:8px;margin-bottom:-1px;padding:10px 12px;color:var(--mute);background:none;border:0;border-bottom:3px solid transparent;border-radius:0}
-.tabs button::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--k)}
-.tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--k)}
-.tabs small{font-weight:400}
-[data-t=html]{--k:var(--h)}[data-t=css]{--k:var(--c)}[data-t=js]{--k:var(--j)}
-.bar{display:flex;align-items:center;gap:8px;padding:10px 0}
-.bar span{flex:1;font-size:.9rem;color:var(--mute)}
-.bar button{padding:7px 14px;font-size:.9rem}
-.bar button:disabled{opacity:.5;cursor:default}
-#out{margin:0;padding:14px 14px 14px 16px;max-height:64vh;overflow:auto;white-space:pre;tab-size:2;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--k);border-radius:6px;font:400 13px/1.6 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-.src{margin-top:16px}
-.src ul{margin:8px 0 0;padding:0;list-style:none}
-.src li{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:.85rem;color:var(--mute);word-break:break-all}
-.src li::before{content:"";flex:none;width:9px;height:9px;margin-top:.5em;border-radius:50%;background:var(--k)}
-.src li b{color:var(--ink)}
-.src li.bad,.src li.bad b{color:var(--err)}
-.note{max-width:62ch;margin:28px 0 0;font-size:.85rem;color:var(--mute)}
-</style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="dark">
+    <title>Web Source Fetcher - Cyber Edition</title>
+    
+    <!-- Preconnect & Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        cyber: {
+                            400: '#facc15', // Yellow 400
+                            500: '#f59e0b', // Amber 500
+                            600: '#d97706', // Amber 600
+                        }
+                    },
+                    animation: {
+                        'spin-slow': 'spin 4s linear infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #030305;
+            color: #e2e8f0;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 100vh;
+            /* Background gradient inspired by your other projects */
+            background-image: 
+                radial-gradient(circle at 15% 0%, rgba(245, 158, 11, 0.15) 0%, transparent 25%),
+                radial-gradient(circle at 85% 100%, rgba(245, 158, 11, 0.1) 0%, transparent 25%);
+        }
+        
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: linear-gradient(145deg, rgba(15, 15, 18, 0.8), rgba(5, 5, 8, 0.95));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(245, 158, 11, 0.15);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.9), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        /* Dark Input */
+        .input-dark {
+            background-color: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #f8fafc;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+        }
+        .input-dark:hover, .input-dark:focus {
+            border-color: #facc15;
+            background-color: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.2), inset 0 2px 4px rgba(0,0,0,0.8);
+            outline: none;
+        }
+        
+        select.input-dark {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23facc15' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+            padding-right: 2.5rem;
+        }
+
+        /* Cyber Button */
+        .btn-cyber {
+            background: linear-gradient(135deg, #d97706 0%, #facc15 100%);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4), inset 0 1px 0 rgba(255,255,255,0.4);
+            color: #000;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-cyber:hover:not(:disabled) {
+            box-shadow: 0 6px 25px rgba(250, 204, 21, 0.6), inset 0 1px 0 rgba(255,255,255,0.6);
+            transform: translateY(-2px);
+        }
+        .btn-cyber:active:not(:disabled) {
+            transform: translateY(2px) scale(0.97);
+            box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
+        }
+        .btn-cyber::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent);
+            transform: skewX(-20deg);
+        }
+        .btn-cyber:hover:not(:disabled)::after { animation: shine 1s ease forwards; }
+        @keyframes shine { 100% { left: 200%; } }
+        
+        .btn-cyber:disabled {
+            filter: grayscale(100%);
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Cyber Checkbox */
+        .cyber-checkbox {
+            appearance: none;
+            width: 1.25rem; 
+            height: 1.25rem;
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(245, 158, 11, 0.5);
+            border-radius: 0.25rem;
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .cyber-checkbox::before {
+            content: "";
+            width: 0.65rem;
+            height: 0.65rem;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em #000;
+            transform-origin: center;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+        .cyber-checkbox:checked {
+            background-color: #facc15;
+            border-color: #facc15;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+        }
+        .cyber-checkbox:checked::before { transform: scale(1); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px;}
+        ::-webkit-scrollbar-track { background: #000; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #d97706; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #facc15; }
+
+        /* Output Area */
+        pre#out {
+            tab-size: 2;
+            scrollbar-width: thin;
+            scrollbar-color: #d97706 #000;
+        }
+        pre#out[data-t="html"] { border-left-color: #f97316; }
+        pre#out[data-t="css"] { border-left-color: #3b82f6; }
+        pre#out[data-t="js"] { border-left-color: #eab308; }
+
+        /* Details & Summary */
+        details > summary { list-style: none; outline: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        
+        /* Nav Tabs */
+        .nav-tab {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-tab.active {
+            color: #facc15;
+            border-bottom-color: #facc15;
+            background-color: rgba(245, 158, 11, 0.1);
+        }
+        .nav-tab[data-t="html"].active { color: #f97316; border-bottom-color: #f97316; background-color: rgba(249, 115, 22, 0.1); }
+        .nav-tab[data-t="css"].active { color: #3b82f6; border-bottom-color: #3b82f6; background-color: rgba(59, 130, 246, 0.1); }
+        .nav-tab[data-t="js"].active { color: #eab308; border-bottom-color: #eab308; background-color: rgba(234, 179, 8, 0.1); }
+    </style>
 </head>
-<body>
-<main>
-<h1>Ambil source code web target</h1>
-<p class="sub">HTML, CSS, dan JavaScript dari halaman yang bisa dibuka publik.</p>
+<body class="p-4 md:p-8 flex justify-center items-start">
 
-<div class="field">
-  <input id="url" type="text" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="https://contoh.com" aria-label="URL web target">
-  <button id="go" class="go">Ambil source code</button>
-</div>
-
-<details class="opt">
-  <summary>Pengaturan</summary>
-  <div class="grid">
-    <div>
-      <label for="proxy">Jalur pengambilan</label>
-      <select id="proxy">
-        <option value="auto">Otomatis, coba semua jalur</option>
-        <option value="langsung">Langsung, tanpa proxy</option>
-        <option value="allorigins">AllOrigins</option>
-        <option value="codetabs">CodeTabs</option>
-        <option value="corsproxy">corsproxy.io</option>
-        <option value="custom">Proxy kustom</option>
-      </select>
+<main class="w-full max-w-4xl glass-panel rounded-xl sm:rounded-2xl flex flex-col relative z-10 overflow-hidden shadow-[0_0_30px_rgba(245,158,11,0.1)]">
+    <!-- Top Neon Bar -->
+    <div class="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-yellow-300 via-cyber-500 to-orange-600"></div>
+    
+    <!-- Header Section -->
+    <div class="p-6 md:p-8 border-b border-cyber-500/20 relative">
+        <div class="flex items-center gap-4 relative z-10">
+            <div class="w-12 h-12 md:w-16 md:h-16 rounded-lg bg-cyber-500/20 border border-cyber-400/50 flex items-center justify-center text-cyber-400 shadow-[0_0_15px_rgba(245,158,11,0.3)] shrink-0">
+                <i class="fas fa-spider text-2xl md:text-3xl"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl md:text-4xl font-extrabold tracking-tight text-white mb-1">Source <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyber-400 to-orange-500">Fetcher</span></h1>
+                <p class="text-slate-400 text-xs md:text-sm font-mono">Ambil HTML, CSS, & JS dari web publik secara instan.</p>
+            </div>
+        </div>
+        <i class="fas fa-code absolute right-4 bottom-4 text-7xl text-white/5 transform -rotate-12 pointer-events-none"></i>
     </div>
-    <div id="cwrap" hidden>
-      <label for="custom">Proxy kustom (URL target ditempel di akhir)</label>
-      <input id="custom" type="text" inputmode="url" autocapitalize="none" spellcheck="false" placeholder="https://proxy-kamu.workers.dev/?url=">
+
+    <!-- Main Content -->
+    <div class="p-6 md:p-8 flex flex-col gap-6">
+        
+        <!-- Input Area -->
+        <div class="flex flex-col md:flex-row gap-3">
+            <div class="relative flex-1 group">
+                <i class="fas fa-globe absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyber-400 transition-colors"></i>
+                <input id="url" type="text" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="https://contoh.com" class="w-full py-3 pl-11 pr-4 input-dark rounded-lg mono text-sm" aria-label="URL web target">
+            </div>
+            <button id="go" class="btn-cyber font-bold py-3 px-8 rounded-lg flex items-center justify-center gap-2 shrink-0">
+                <i class="fas fa-bolt"></i> <span>Ambil Source</span>
+            </button>
+        </div>
+
+        <!-- Settings -->
+        <details class="group bg-black/40 border border-cyber-500/20 rounded-lg p-4 transition-all">
+            <summary class="font-bold text-slate-300 cursor-pointer flex justify-between items-center select-none hover:text-cyber-400 transition-colors">
+                <span class="flex items-center gap-2 text-sm"><i class="fas fa-cog text-cyber-500"></i> Pengaturan Proxy & Mode</span>
+                <i class="fas fa-chevron-down text-slate-500 transition-transform duration-300 group-open:rotate-180"></i>
+            </summary>
+            
+            <div class="mt-4 pt-4 border-t border-cyber-500/20 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="proxy" class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Jalur Pengambilan</label>
+                    <select id="proxy" class="w-full py-2.5 px-4 input-dark rounded-lg text-sm cursor-pointer">
+                        <option value="auto">Otomatis (Coba Semua)</option>
+                        <option value="langsung">Langsung (Tanpa Proxy)</option>
+                        <option value="allorigins">AllOrigins API</option>
+                        <option value="codetabs">CodeTabs API</option>
+                        <option value="corsproxy">corsproxy.io</option>
+                        <option value="custom">Proxy Kustom...</option>
+                    </select>
+                </div>
+                <div id="cwrap" hidden>
+                    <label for="custom" class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">URL Proxy Kustom</label>
+                    <input id="custom" type="text" inputmode="url" autocapitalize="none" spellcheck="false" placeholder="https://proxy-kamu.workers.dev/?url=" class="w-full py-2.5 px-4 input-dark rounded-lg text-sm mono">
+                </div>
+                <div class="md:col-span-2 flex items-center mt-2">
+                    <input type="checkbox" id="ext" class="cyber-checkbox mr-3" checked>
+                    <label for="ext" class="text-sm font-medium text-slate-300 cursor-pointer select-none hover:text-white transition-colors">Ambil juga file CSS dan JS eksternal (Deep Fetch)</label>
+                </div>
+            </div>
+        </details>
+
+        <!-- Status Message -->
+        <p id="msg" role="status" class="text-sm font-mono min-h-[1.5rem] text-slate-400"></p>
+
+        <!-- Results Section -->
+        <section id="res" class="hidden flex flex-col gap-4 animate-[fadeUp_0.5s_ease-out]">
+            
+            <!-- Tabs -->
+            <div class="flex bg-black/60 rounded-lg border border-cyber-500/20 overflow-hidden" id="tabs" role="tablist">
+                <button role="tab" data-t="html" class="nav-tab active flex-1 py-3 text-sm font-bold text-slate-400 hover:bg-white/5 flex justify-center items-center gap-2" aria-selected="true">
+                    <i class="fab fa-html5 text-orange-500"></i> HTML
+                </button>
+                <button role="tab" data-t="css" class="nav-tab flex-1 py-3 text-sm font-bold text-slate-400 hover:bg-white/5 flex justify-center items-center gap-2" aria-selected="false">
+                    <i class="fab fa-css3-alt text-blue-500"></i> CSS <span id="n-css" class="bg-black/80 px-1.5 py-0.5 rounded text-[10px] border border-blue-500/30"></span>
+                </button>
+                <button role="tab" data-t="js" class="nav-tab flex-1 py-3 text-sm font-bold text-slate-400 hover:bg-white/5 flex justify-center items-center gap-2" aria-selected="false">
+                    <i class="fab fa-js-square text-yellow-500"></i> JS <span id="n-js" class="bg-black/80 px-1.5 py-0.5 rounded text-[10px] border border-yellow-500/30"></span>
+                </button>
+            </div>
+            
+            <!-- Toolbar & Output -->
+            <div class="bg-[#0a0a0f] border border-cyber-500/30 rounded-lg overflow-hidden shadow-inner flex flex-col">
+                <div class="bg-black/80 border-b border-cyber-500/20 p-2 md:p-3 flex justify-between items-center gap-2">
+                    <span id="meta" class="text-[10px] md:text-xs font-mono text-slate-400 px-2"></span>
+                    <div class="flex gap-2 shrink-0">
+                        <button id="copy" class="text-xs bg-slate-800 hover:bg-cyber-500/20 text-slate-300 hover:text-cyber-400 px-3 py-1.5 rounded transition border border-slate-700 hover:border-cyber-500/50 flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fas fa-copy"></i> <span class="hidden sm:inline">Salin</span>
+                        </button>
+                        <button id="dl" class="text-xs bg-cyber-500/20 hover:bg-cyber-500/40 text-cyber-400 px-3 py-1.5 rounded transition border border-cyber-500/50 flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed font-bold">
+                            <i class="fas fa-download"></i> <span class="hidden sm:inline">Unduh</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <pre id="out" data-t="html" class="m-0 p-4 w-full h-[50vh] md:h-[60vh] overflow-auto text-[11px] md:text-[13px] leading-relaxed mono text-slate-300 bg-transparent border-l-[3px] focus:outline-none" tabindex="0"></pre>
+            </div>
+
+            <!-- Source Log -->
+            <details class="group bg-black/40 border border-slate-700/50 rounded-lg p-3">
+                <summary id="sumsrc" class="font-bold text-xs text-slate-400 cursor-pointer flex items-center gap-2 select-none hover:text-slate-200">
+                    <i class="fas fa-list-ul"></i> Sumber Log
+                </summary>
+                <ul id="src" class="mt-3 space-y-1.5 text-[10px] md:text-xs font-mono border-t border-slate-700/50 pt-3 max-h-40 overflow-y-auto"></ul>
+            </details>
+        </section>
+
+        <!-- Footer Note -->
+        <p class="text-[10px] md:text-xs text-slate-500 border-t border-cyber-500/20 pt-4 text-center">
+            <i class="fas fa-info-circle text-cyber-600 mr-1"></i> Gunakan dengan bijak dan hormati hak cipta. Halaman berbasis JS (React/Vue/Angular) hanya akan mengembalikan struktur awal (App Shell).
+        </p>
     </div>
-  </div>
-  <label class="chk"><input id="ext" type="checkbox" checked> Ambil juga file CSS dan JS eksternal</label>
-</details>
-
-<p id="msg" role="status"></p>
-
-<section id="res">
-  <div class="tabs" id="tabs" role="tablist">
-    <button role="tab" data-t="html" aria-selected="true">HTML</button>
-    <button role="tab" data-t="css" aria-selected="false">CSS <small id="n-css"></small></button>
-    <button role="tab" data-t="js" aria-selected="false">JS <small id="n-js"></small></button>
-  </div>
-  <div class="bar"><span id="meta"></span><button id="copy">Salin</button><button id="dl">Unduh</button></div>
-  <pre id="out" data-t="html" tabindex="0"></pre>
-  <details class="src"><summary id="sumsrc">Sumber</summary><ul id="src"></ul></details>
-</section>
-
-<p class="note">Pakai untuk situs milikmu atau yang mengizinkan, dan hormati hak cipta serta ketentuan layanan situs target. Halaman yang membangun isinya lewat JavaScript hanya menyerahkan HTML awalnya, jadi isi yang muncul setelah halaman terbuka tidak ikut terambil.</p>
 </main>
 
 <script>
-const $=s=>document.querySelector(s),LIM=3e5;
-const S={html:'',css:'',js:'',tab:'html',host:'situs',n:{css:0,js:0}};
-const P=[
-  ['langsung',u=>u],
-  ['allorigins',u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u)],
-  ['codetabs',u=>'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(u)],
-  ['corsproxy',u=>'https://corsproxy.io/?url='+encodeURIComponent(u)]
+// Logic JavaScript asli tetap dipertahankan, dengan sedikit penyesuaian untuk integrasi UI baru
+const $ = s => document.querySelector(s);
+const LIM = 3e5;
+const S = { html:'', css:'', js:'', tab:'html', host:'situs', n:{css:0,js:0} };
+const P = [
+  ['langsung', u => u],
+  ['allorigins', u => 'https://api.allorigins.win/raw?url='+encodeURIComponent(u)],
+  ['codetabs', u => 'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(u)],
+  ['corsproxy', u => 'https://corsproxy.io/?url='+encodeURIComponent(u)]
 ];
-let good=null;
+let good = null;
 
-const say=(t,e)=>{const m=$('#msg');m.textContent=t;m.className=e?'err':''};
-const why=e=>{const m=(e&&e.message)||String(e);return/failed to fetch|networkerror|load failed/i.test(m)?'diblokir atau jaringan bermasalah':m};
-const chain=()=>{
-  const c=$('#proxy').value,k=$('#custom').value.trim();
-  if(c==='custom')return k?[['kustom',u=>k+encodeURIComponent(u)]]:[];
-  if(c!=='auto')return P.filter(p=>p[0]===c);
-  return good?[good,...P.filter(p=>p!==good)]:P;
+const say = (t, err) => {
+  const m = $('#msg');
+  if(err) {
+      m.innerHTML = `<span class="text-red-400"><i class="fas fa-exclamation-triangle mr-1"></i> ${t}</span>`;
+  } else {
+      // Loading state check
+      if(t.includes('Mengambil')) {
+          m.innerHTML = `<i class="fas fa-circle-notch fa-spin text-cyber-500 mr-2"></i><span class="text-cyber-400">${t}</span>`;
+      } else {
+          m.innerHTML = `<span class="text-emerald-400"><i class="fas fa-check-circle mr-1"></i> ${t}</span>`;
+      }
+  }
+};
+
+const why = e => {
+  const m = (e && e.message) || String(e);
+  return /failed to fetch|networkerror|load failed/i.test(m) ? 'diblokir atau jaringan bermasalah' : m;
+};
+
+const chain = () => {
+  const c = $('#proxy').value, k = $('#custom').value.trim();
+  if(c === 'custom') return k ? [['kustom', u => k+encodeURIComponent(u)]] : [];
+  if(c !== 'auto') return P.filter(p => p[0] === c);
+  return good ? [good, ...P.filter(p => p !== good)] : P;
 };
 
 async function getText(url){
-  const ch=chain();
-  if(!ch.length)throw new Error('isi URL proxy kustom dulu');
+  const ch = chain();
+  if(!ch.length) throw new Error('Isi URL proxy kustom dulu');
   let last;
   for(const p of ch){
-    const ac=new AbortController(),t=setTimeout(()=>ac.abort(),15000);
+    const ac = new AbortController(), t = setTimeout(() => ac.abort(), 15000);
     try{
-      const r=await fetch(p[1](url),{signal:ac.signal});
-      if(!r.ok)throw new Error('HTTP '+r.status);
-      const x=await r.text();
-      if(!x.trim())throw new Error('respons kosong');
-      good=p;return{x,via:p[0]};
-    }catch(e){last=new Error(e.name==='AbortError'?'waktu habis':why(e))}
-    finally{clearTimeout(t)}
+      const r = await fetch(p[1](url), {signal: ac.signal});
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const x = await r.text();
+      if(!x.trim()) throw new Error('respons kosong');
+      good = p; return {x, via: p[0]};
+    } catch(e) { 
+        last = new Error(e.name === 'AbortError' ? 'waktu habis' : why(e));
+    } finally { 
+        clearTimeout(t); 
+    }
   }
   throw last;
 }
 
-async function pool(a,n,f){
-  let i=0;
-  await Promise.all(Array.from({length:Math.min(n,a.length)},async()=>{while(i<a.length)await f(a[i++])}));
+async function pool(a, n, f){
+  let i = 0;
+  await Promise.all(Array.from({length: Math.min(n, a.length)}, async () => {
+      while(i < a.length) await f(a[i++]);
+  }));
 }
 
 async function run(){
-  const raw=$('#url').value.trim();
-  if(!raw)return say('Isi URL web target dulu.',1);
+  const raw = $('#url').value.trim();
+  if(!raw) return say('Isi URL web target dulu.', 1);
   let url;
-  try{url=new URL(/^https?:\/\//i.test(raw)?raw:'https://'+raw).href}catch{return say('URL tidak valid. Contoh yang benar: https://contoh.com',1)}
-  const go=$('#go');
-  go.disabled=true;go.textContent='Mengambil…';
-  $('#res').style.display='none';
-  say('Mengambil HTML…');
-  try{
-    const m=await getText(url);
-    const doc=new DOMParser().parseFromString(m.x,'text/html');
-    let base=url;
-    const be=doc.querySelector('base[href]');
-    try{if(be)base=new URL(be.getAttribute('href'),url).href}catch{}
-    const abs=h=>{try{const u=new URL(h,base);return/^https?:$/.test(u.protocol)?u.href:null}catch{return null}};
+  try { 
+      url = new URL(/^https?:\/\//i.test(raw) ? raw : 'https://'+raw).href; 
+  } catch { 
+      return say('URL tidak valid. Contoh: https://contoh.com', 1); 
+  }
+  
+  const go = $('#go');
+  go.disabled = true; 
+  go.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Memproses...</span>';
+  $('#res').classList.add('hidden');
+  
+  say('Mengambil HTML awal...');
+  
+  try {
+    const m = await getText(url);
+    const doc = new DOMParser().parseFromString(m.x, 'text/html');
+    let base = url;
+    const be = doc.querySelector('base[href]');
+    try { if(be) base = new URL(be.getAttribute('href'), url).href; } catch{}
+    const abs = h => {
+        try { 
+            const u = new URL(h, base); 
+            return /^https?:$/.test(u.protocol) ? u.href : null; 
+        } catch { return null; }
+    };
 
-    const it=[];let ci=0,ji=0;
-    doc.querySelectorAll('style,link[rel~="stylesheet"][href],script').forEach(el=>{
-      const t=el.tagName;
-      if(t==='STYLE'){
-        if(el.textContent.trim())it.push({k:'css',l:'<style> inline #'+(++ci),x:el.textContent});
-      }else if(t==='LINK'){
-        const u=abs(el.getAttribute('href'));
-        if(u)it.push({k:'css',l:u,u});
-      }else{
-        const ty=(el.getAttribute('type')||'').toLowerCase();
-        if(ty&&!/javascript|ecmascript|module/.test(ty))return;
-        const s=el.getAttribute('src');
-        if(s){const u=abs(s);if(u)it.push({k:'js',l:u,u})}
-        else if(el.textContent.trim())it.push({k:'js',l:'<script> inline #'+(++ji),x:el.textContent});
+    const it = []; let ci = 0, ji = 0;
+    doc.querySelectorAll('style,link[rel~="stylesheet"][href],script').forEach(el => {
+      const t = el.tagName;
+      if(t === 'STYLE'){
+        if(el.textContent.trim()) it.push({k:'css', l:'<style> inline #'+(++ci), x:el.textContent});
+      } else if(t === 'LINK'){
+        const u = abs(el.getAttribute('href'));
+        if(u) it.push({k:'css', l:u, u});
+      } else {
+        const ty = (el.getAttribute('type') || '').toLowerCase();
+        if(ty && !/javascript|ecmascript|module/.test(ty)) return;
+        const s = el.getAttribute('src');
+        if(s){
+            const u = abs(s); 
+            if(u) it.push({k:'js', l:u, u});
+        } else if(el.textContent.trim()) {
+            it.push({k:'js', l:'<script> inline #'+(++ji), x:el.textContent});
+        }
       }
     });
 
-    const ex=$('#ext').checked?it.filter(i=>i.u):[];
-    let d=0;
-    await pool(ex,4,async i=>{
-      try{const r=await getText(i.u);i.x=r.x}catch(e){i.e=e.message||'gagal'}
-      say('Mengambil CSS dan JS eksternal… '+(++d)+' dari '+ex.length);
-    });
+    const ex = $('#ext').checked ? it.filter(i => i.u) : [];
+    let d = 0;
+    
+    if(ex.length > 0) {
+        await pool(ex, 4, async i => {
+          try { 
+              const r = await getText(i.u); i.x = r.x; 
+          } catch(e) { 
+              i.e = e.message || 'gagal'; 
+          }
+          d++;
+          say(`Mengambil CSS/JS eksternal... (${d}/${ex.length})`);
+        });
+    }
 
-    const join=k=>it.filter(i=>i.k===k).map(i=>i.x!=null
-      ?'/* ===== '+i.l+' ===== */\n'+i.x.trim()+'\n'
-      :'/* ===== '+i.l+' (tidak diambil: '+(i.e||'dilewati')+') ===== */\n').join('\n');
+    const join = k => it.filter(i => i.k === k).map(i => i.x != null
+      ? '/* ===== '+i.l+' ===== */\n'+i.x.trim()+'\n'
+      : '/* ===== '+i.l+' (Gagal: '+(i.e||'dilewati')+') ===== */\n'
+    ).join('\n');
 
-    S.html=m.x;S.css=join('css');S.js=join('js');
-    S.host=new URL(url).hostname.replace(/^www\./,'');
-    S.n={css:it.filter(i=>i.k==='css').length,js:it.filter(i=>i.k==='js').length};
-    $('#n-css').textContent=S.n.css||'';
-    $('#n-js').textContent=S.n.js||'';
-    list(it,url,m.via);
+    S.html = m.x; S.css = join('css'); S.js = join('js');
+    S.host = new URL(url).hostname.replace(/^www\./, '');
+    S.n = {css: it.filter(i=>i.k==='css').length, js: it.filter(i=>i.k==='js').length};
+    
+    $('#n-css').textContent = S.n.css || '0';
+    $('#n-js').textContent = S.n.js || '0';
+    
+    list(it, url, m.via);
     show('html');
-    $('#res').style.display='block';
-    const gagal=it.filter(i=>i.e).length;
-    say(gagal?'Source code diambil, tapi '+gagal+' file eksternal gagal. Lihat daftar Sumber di bawah.':'Source code diambil.');
-  }catch(e){
-    say('Gagal mengambil '+url+' ('+(e.message||e)+'). Pilih jalur lain di Pengaturan atau isi proxy kustom.',1);
+    $('#res').classList.remove('hidden');
+    
+    const gagal = it.filter(i => i.e).length;
+    if(gagal) {
+        say(`Selesai, tapi ${gagal} resource eksternal gagal dimuat (lihat Sumber Log).`, 1);
+    } else {
+        say('Source code berhasil diekstrak!');
+    }
+    
+  } catch(e) {
+    say(`Gagal: ${e.message||e}. Coba ganti Proxy di Pengaturan.`, 1);
   }
-  go.disabled=false;go.textContent='Ambil source code';
+  
+  go.disabled = false; 
+  go.innerHTML = '<i class="fas fa-bolt"></i> <span>Ambil Source</span>';
 }
 
-function list(it,url,via){
-  const ul=$('#src');ul.textContent='';
-  const add=(k,st,txt,bad)=>{
-    const li=document.createElement('li'),b=document.createElement('b'),s=document.createElement('span');
-    li.dataset.k=k;if(bad)li.className='bad';
-    b.textContent=st+' ';s.append(b,txt);li.append(s);ul.append(li);
+function list(it, url, via){
+  const ul = $('#src'); ul.innerHTML = '';
+  const add = (k, st, txt, bad) => {
+    const li = document.createElement('li');
+    li.className = `flex gap-2 py-1 border-b border-slate-700/30 break-all ${bad ? 'text-red-400' : 'text-slate-300'}`;
+    let iconColor = k==='html'?'text-orange-500':k==='css'?'text-blue-500':'text-yellow-500';
+    li.innerHTML = `<i class="fas fa-circle mt-1 text-[8px] ${iconColor} shrink-0"></i> 
+                    <div><b class="${bad?'text-red-500':'text-white'}">[${st}]</b> ${txt}</div>`;
+    ul.appendChild(li);
   };
-  add('html','Berhasil',url+' (lewat '+via+')');
-  it.forEach(i=>{
-    if(!i.u)add(i.k,'Inline',i.l);
-    else if(i.x!=null)add(i.k,'Berhasil',i.l);
-    else if(i.e)add(i.k,'Gagal',i.l+' ('+i.e+')',1);
-    else add(i.k,'Dilewati',i.l);
+  add('html', 'Sukses', `${url} (via ${via})`);
+  it.forEach(i => {
+    if(!i.u) add(i.k, 'Inline', i.l);
+    else if(i.x != null) add(i.k, 'Sukses', i.l);
+    else if(i.e) add(i.k, 'Gagal', `${i.l} - ${i.e}`, 1);
+    else add(i.k, 'Dilewati', i.l);
   });
-  $('#sumsrc').textContent='Sumber ('+(it.length+1)+')';
+  $('#sumsrc').innerHTML = `<i class="fas fa-list-ul text-cyber-500"></i> Sumber Log (${it.length+1} file)`;
 }
 
 function show(t){
-  S.tab=t;
-  const o=$('#out'),x=S[t];
-  o.dataset.t=t;
-  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));
-  o.textContent=!x?'Tidak ada kode '+t.toUpperCase()+' yang ditemukan di halaman ini.'
-    :x.length>LIM?x.slice(0,LIM)+'\n\n(Tampilan dipotong di '+LIM.toLocaleString('id-ID')+' karakter. Salin dan Unduh tetap membawa seluruh kode.)'
-    :x;
-  o.scrollTop=0;o.scrollLeft=0;
-  $('#meta').textContent=x?x.split('\n').length.toLocaleString('id-ID')+' baris, '+(new Blob([x]).size/1024).toFixed(1)+' KB':'';
-  $('#copy').disabled=$('#dl').disabled=!x;
+  S.tab = t;
+  const o = $('#out'), x = S[t];
+  o.dataset.t = t;
+  
+  document.querySelectorAll('.nav-tab').forEach(b => {
+      if(b.dataset.t === t) {
+          b.classList.add('active');
+          b.setAttribute('aria-selected', 'true');
+      } else {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+      }
+  });
+  
+  if(!x) {
+      o.innerHTML = `<span class="text-slate-500 italic">// Tidak ada kode ${t.toUpperCase()} yang ditemukan di halaman ini.</span>`;
+  } else {
+      o.textContent = x.length > LIM 
+        ? x.slice(0, LIM) + '\n\n/* Output dipotong ('+LIM.toLocaleString('id-ID')+' char). Salin/Unduh untuk mendapat full code. */'
+        : x;
+  }
+  
+  o.scrollTop = 0; o.scrollLeft = 0;
+  
+  if(x) {
+      const lines = x.split('\n').length.toLocaleString('id-ID');
+      const size = (new Blob([x]).size / 1024).toFixed(1);
+      $('#meta').innerHTML = `<i class="fas fa-file-alt mr-1"></i> ${lines} baris &bull; ${size} KB`;
+  } else {
+      $('#meta').textContent = '';
+  }
+  
+  $('#copy').disabled = $('#dl').disabled = !x;
 }
 
-$('#go').onclick=run;
-$('#url').onkeydown=e=>{if(e.key==='Enter')run()};
-$('#proxy').onchange=e=>{$('#cwrap').hidden=e.target.value!=='custom'};
-$('#tabs').onclick=e=>{const b=e.target.closest('button');if(b)show(b.dataset.t)};
+// Event Listeners
+$('#go').onclick = run;
+$('#url').onkeydown = e => { if(e.key === 'Enter') run() };
+$('#proxy').onchange = e => { $('#cwrap').hidden = e.target.value !== 'custom' };
 
-$('#copy').onclick=async()=>{
-  const x=S[S.tab],b=$('#copy');
-  try{await navigator.clipboard.writeText(x)}
-  catch{
-    const a=document.createElement('textarea');
-    a.value=x;document.body.appendChild(a);a.select();
-    try{document.execCommand('copy')}catch{}
-    a.remove();
+// Tab Navigation
+document.querySelectorAll('.nav-tab').forEach(btn => {
+    btn.onclick = (e) => {
+        const t = e.currentTarget.dataset.t;
+        if(t) show(t);
+    };
+});
+
+$('#copy').onclick = async () => {
+  const x = S[S.tab], b = $('#copy');
+  const oriHtml = b.innerHTML;
+  try {
+      await navigator.clipboard.writeText(x);
+  } catch {
+      const a = document.createElement('textarea');
+      a.value = x; document.body.appendChild(a); a.select();
+      try{ document.execCommand('copy') } catch{}
+      a.remove();
   }
-  b.textContent='Tersalin';
-  setTimeout(()=>b.textContent='Salin',1500);
+  b.innerHTML = '<i class="fas fa-check text-emerald-400"></i> <span class="hidden sm:inline text-emerald-400">Tersalin!</span>';
+  b.classList.add('border-emerald-500/50');
+  setTimeout(() => {
+      b.innerHTML = oriHtml;
+      b.classList.remove('border-emerald-500/50');
+  }, 2000);
 };
 
-$('#dl').onclick=()=>{
-  const u=URL.createObjectURL(new Blob([S[S.tab]],{type:'text/plain;charset=utf-8'})),a=document.createElement('a');
-  a.href=u;a.download=S.host+'.'+S.tab;
-  document.body.appendChild(a);a.click();a.remove();
-  setTimeout(()=>URL.revokeObjectURL(u),2000);
+$('#dl').onclick = () => {
+  const u = URL.createObjectURL(new Blob([S[S.tab]], {type: 'text/plain;charset=utf-8'}));
+  const a = document.createElement('a');
+  a.href = u; a.download = S.host + '.' + S.tab;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 2000);
 };
+
+// Add fade animation style dynamically for results
+const style = document.createElement('style');
+style.innerHTML = `
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+`;
+document.head.appendChild(style);
 </script>
 </body>
 </html>
